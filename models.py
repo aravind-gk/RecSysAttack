@@ -7,7 +7,7 @@ from torch.nn.modules.module import Module
 
 class CF(Module):
     """Simple Collaborative Filtering"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = None):
         super(CF, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
@@ -20,12 +20,12 @@ class CF(Module):
 
 class CFD(Module):
     """Simple Collaborative Filtering with dropout"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = 0.5):
         super(CFD, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
-        self.drop_u = nn.Dropout(p = 0.3)
-        self.drop_i = nn.Dropout(p = 0.3)
+        self.drop_u = nn.Dropout(p = prob)
+        self.drop_i = nn.Dropout(p = prob)
 
     def forward(self, user, item):
         u = self.user_emb(user)
@@ -37,7 +37,7 @@ class CFD(Module):
 
 class GMF(Module):
     """General Matrix Factorization with 1 hidden layer"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = None):
         super(GMF, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
@@ -52,13 +52,13 @@ class GMF(Module):
 
 class GMFD(Module):
     """General Matrix Factorization with 1 hidden layer and dropout"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = 0.5):
         super(GMFD, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
         self.h = nn.Linear(n_factors, 1)
-        self.drop_u = nn.Dropout(p = 0.2)
-        self.drop_i = nn.Dropout(p = 0.2)
+        self.drop_u = nn.Dropout(p = prob)
+        self.drop_i = nn.Dropout(p = prob)
 
     def forward(self, user, item):
         u = self.user_emb(user)
@@ -72,13 +72,13 @@ class GMFD(Module):
 # GMF with user-item bias and dropout
 class GMFB(Module):
     """General Matrix Factorization with user-item bias, 1 hidden layer and dropout"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = 0.5):
         super(GMFB, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
         self.h = nn.Linear(n_factors * 3, 1)
-        self.drop_u = nn.Dropout(p = 0.2)
-        self.drop_i = nn.Dropout(p = 0.2)
+        self.drop_u = nn.Dropout(p = prob)
+        self.drop_i = nn.Dropout(p = prob)
 
     def forward(self, user, item):
         u = self.user_emb(user)
@@ -92,15 +92,15 @@ class GMFB(Module):
 
 class MLP(Module):
     """Multi-layer Perceptron without hadamard product"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = 0.5):
         super(MLP, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
         self.h = nn.Linear(n_factors * 2, n_factors * 2)
         self.o = nn.Linear(n_factors * 2, 1)
-        self.drop_u = nn.Dropout(p = 0.3)
-        self.drop_i = nn.Dropout(p = 0.3)
-        self.drop_x = nn.Dropout(p = 0.3)
+        self.drop_u = nn.Dropout(p = prob)
+        self.drop_i = nn.Dropout(p = prob)
+        self.drop_x = nn.Dropout(p = prob)
         self.tanh = nn.Tanh()
 
     def forward(self, user, item):
