@@ -120,7 +120,7 @@ class MLP(Module):
 
 class NeuMF(Module):
     """NeuMF combining 1-layer GMF and 2-layer MLP with additional layer"""
-    def __init__(self, n_users, n_items, n_factors):
+    def __init__(self, n_users, n_items, n_factors, prob = 0.5):
         super(NeuMF, self).__init__()
         self.user_emb = nn.Embedding(n_users, n_factors)
         self.item_emb = nn.Embedding(n_items, n_factors)
@@ -129,7 +129,7 @@ class NeuMF(Module):
         self.mlp2 = nn.Linear(n_factors * 2, n_factors)
         self.out = nn.Linear(n_factors * 2, 1)
         
-        self.drop = nn.Dropout(p = 0.3)
+        self.drop = nn.Dropout(p = prob)
         self.tanh = nn.Tanh()
 
     def forward(self, user, item):
