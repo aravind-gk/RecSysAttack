@@ -98,9 +98,9 @@ class MLP(Module):
         self.item_emb = nn.Embedding(n_items, n_factors)
         self.h = nn.Linear(n_factors * 2, n_factors * 2)
         self.o = nn.Linear(n_factors * 2, 1)
-        self.drop_u = nn.Dropout(p = 0.2)
-        self.drop_i = nn.Dropout(p = 0.2)
-        self.drop_x = nn.Dropout(p = 0.2)
+        self.drop_u = nn.Dropout(p = 0.3)
+        self.drop_i = nn.Dropout(p = 0.3)
+        self.drop_x = nn.Dropout(p = 0.3)
         self.tanh = nn.Tanh()
 
     def forward(self, user, item):
@@ -112,8 +112,8 @@ class MLP(Module):
         # x = self.tanh(x)
         x = self.h(x)
         # x = self.drop_x(x)
-        x = F.relu(x) # 1 (both relu and sigmoid seem to work fine here)
-        # x = torch.sigmoid(x) # 2
+        # x = F.relu(x) # 1 (both relu and sigmoid seem to work fine here)
+        x = torch.sigmoid(x) # 2
         # x = self.tanh(x) # 3
         x = self.o(x)
         return torch.sigmoid(x.squeeze())
