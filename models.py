@@ -118,6 +118,41 @@ class MLP(Module):
         x = self.o(x)
         return torch.sigmoid(x.squeeze())
 
+class NeuMF(Module):
+    """NeuMF combining 1-layer GMF and 2-layer MLP with additional layer"""
+    def __init__(self, n_users, n_items, n_factors):
+        super(NeuMF, self).__init__()
+        self.user_emb = nn.Embedding(n_users, n_factors)
+        self.item_emb = nn.Embedding(n_items, n_factors)
+        self.gmf = nn.Linear(n_factors, n_factors)
+        self.mlp1 = nn.Linear(n_factors * 2, n_factors * 2)
+        self.mlp2 = nn.Linear(n_factors * 2, n_factors)
+        self.out = nn.Linear(n_factors * 2, 1)
+        
+        self.drop = nn.Dropout(p = 0.3)
+        self.tanh = nn.Tanh()
+
+    def forward(self, user, item):
+        user = self.user_emb(user)
+        item = self.item_emb(item)
+        user = self.drop(user)
+        item = self.drop(item)
+
+        gmf = (user * item)
+        gmf = self.gmf(gmf)
+
+        mlp = torch.concat([user, item], 1)
+        mlp = self.mlp1(mlp)
+        mlp = torch.sigmoid(mlp)
+        mlp = self.mlp2(mlp)
+
+        neumf = torch.concat([gmf, mlp], 1)
+        neumf = self.drop(neumf)
+        neumf = self.out(neumf)
+        neumf = neumf.squeeze()
+
+        return torch.sigmoid(neumf)
+
 def get_accuracy(y_hat, y):
     y = y.clone().int()
     y_hat = (y_hat.clone() > 0.5).int()
